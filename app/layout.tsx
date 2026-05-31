@@ -3,7 +3,7 @@ import Link from "next/link";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Pen & Parker | A Lifestyle Blog",
+  title: "Trendi | A Lifestyle Blog",
   description: "A minimalist lifestyle blog with unique details and intentional styling.",
 };
 
@@ -26,7 +26,7 @@ export default function RootLayout({
             </div>
             
             <div className="header-logo">
-              <h1>Pen & Parker</h1>
+              <h1>Trendi</h1>
               <p>A Lifestyle Blog</p>
             </div>
 
@@ -34,8 +34,8 @@ export default function RootLayout({
               <nav className="main-nav">
                 <Link href="/">Blog</Link>
                 <Link href="/articles">Articles</Link>
-                <Link href="/archive">Archive</Link>
-                <Link href="/shop">Shop</Link>
+                {/* <Link href="/archive">Archive</Link> */}
+                {/* <Link href="/shop">Shop</Link> */}
                 <Link href="/gallery">Gallery</Link>
                 <Link href="/about">About</Link>
                 <Link href="/contact">Contact</Link>
@@ -80,7 +80,7 @@ export default function RootLayout({
               </div>
             </div>
             <div className="footer-bottom">
-              Copyright 2026 Pen & Parker | Site design handcrafted by you
+              Copyright 2026 Trendi | Site design handcrafted by you
             </div>
           </div>
         </footer>
