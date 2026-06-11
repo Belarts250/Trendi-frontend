@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import "./globals.css";
+import AuthLinks from "./components/AuthLinks";
 
 export const metadata: Metadata = {
   title: "Trendi | A Lifestyle Blog",
@@ -39,8 +40,7 @@ export default function RootLayout({
                 <Link href="/gallery">Gallery</Link>
                 <Link href="/about">About</Link>
                 <Link href="/contact">Contact</Link>
-                <Link href="/login">Login</Link>
-                <Link href="/signup">Sign Up</Link>
+                <AuthLinks />
               </nav>
             </div>
           </header>

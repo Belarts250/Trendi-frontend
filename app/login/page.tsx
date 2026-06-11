@@ -1,7 +1,50 @@
+"use client";
+
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React from "react";
 
 export default function LoginPage() {
+  const router = useRouter();
+
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    try{
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      })
+
+      const data = await response.json();
+
+      if(!response.ok){
+        throw new Error(data.message || "Login failed");
+      }
+
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify({
+        userId: data.userId,
+        name: data.name,
+        email: data.email
+      }));
+
+      router.push("/articles");
+    } catch (err : any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
   return (
     <div style={{
       position: 'fixed',
@@ -27,11 +70,18 @@ export default function LoginPage() {
         textAlign: 'center'
       }}>
         <h2 className="serif-font" style={{ fontSize: '2.5rem', marginBottom: '30px' }}>Welcome Back</h2>
-        <form style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        {error && (
+          <div style={{ color: 'red', marginBottom: '20px', fontSize: '14px' }}>
+            {error}
+          </div>
+        )}
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           <input 
             type="email" 
             placeholder="Email Address" 
             required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             style={{ 
               border: '1px solid var(--border-color)', 
               padding: '15px', 
@@ -44,7 +94,9 @@ export default function LoginPage() {
           />
           <input 
             type="password" 
-            placeholder="Password" 
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)} 
             required
             style={{ 
               border: '1px solid var(--border-color)', 
@@ -57,11 +109,12 @@ export default function LoginPage() {
             }} 
           />
           <button 
-            type="button"
+            type="submit"
+            disabled={loading}
             className="newsletter-btn" 
             style={{ width: '100%', padding: '15px', marginTop: '10px' }}
           >
-            Log In
+            {loading ? "Logging in..." : "Log In"}
           </button>
         </form>
         <p style={{ marginTop: '20px', fontSize: '13px', color: 'var(--text-muted)' }}>

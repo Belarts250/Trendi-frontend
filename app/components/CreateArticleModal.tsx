@@ -1,36 +1,50 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 type Props = {
   isOpen: boolean;
   onClose: () => void;
-  onPublish: (title: string, content: string, image: string) => void;
+  onPublish: (title: string, content: string, image: File | null) => void;
   initialData?: { title: string; content: string; image: string };
 };
 
 export default function CreateArticleModal({ isOpen, onClose, onPublish, initialData }: Props) {
-  const [title, setTitle] = useState(initialData?.title || '');
-  const [content, setContent] = useState(initialData?.content || '');
-  const [image, setImage] = useState(initialData?.image || '');
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [currentImage, setCurrentImage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (initialData) {
+      setTitle(initialData.title);
+      setContent(initialData.content);
+      setCurrentImage(initialData.image);
+      setImageFile(null);
+    } else {
+      setTitle('');
+      setContent('');
+      setCurrentImage(null);
+      setImageFile(null);
+    }
+  }, [initialData, isOpen]);
 
   if (!isOpen) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onPublish(title, content, image);
-    if (!initialData) {
-      setTitle('');
-      setContent('');
-      setImage('');
-    }
+    onPublish(title, content, imageFile);
+    setTitle('');
+    setContent('');
+    setImageFile(null);
+    setCurrentImage(null);
     onClose();
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Fake file upload by using a default image if a file is selected
     if (e.target.files && e.target.files.length > 0) {
-      setImage('/images/cat_blog_1780171321862.png');
+      setImageFile(e.target.files[0]);
+      setCurrentImage(null); // Clear current image when new one is selected
     }
   };
 
@@ -42,7 +56,7 @@ export default function CreateArticleModal({ isOpen, onClose, onPublish, initial
     }}>
       <div style={{
         background: 'var(--background)', padding: '40px', width: '100%', maxWidth: '600px',
-        position: 'relative'
+        position: 'relative', maxHeight: '90vh', overflowY: 'auto'
       }}>
         <button 
           onClick={onClose}
@@ -80,6 +94,28 @@ export default function CreateArticleModal({ isOpen, onClose, onPublish, initial
           <div>
             <label style={{ fontSize: '12px', display: 'block', marginBottom: '5px' }}>Choose Image</label>
             <input type="file" accept="image/*" onChange={handleFileChange} />
+            
+            {imageFile && (
+              <div style={{ marginTop: '15px' }}>
+                <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '5px' }}>Preview (new image):</p>
+                <img 
+                  src={URL.createObjectURL(imageFile)} 
+                  alt="Preview" 
+                  style={{ maxWidth: '100%', maxHeight: '200px', borderRadius: '4px' }}
+                />
+              </div>
+            )}
+            
+            {currentImage && !imageFile && (
+              <div style={{ marginTop: '15px' }}>
+                <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '5px' }}>Current image:</p>
+                <img 
+                  src={currentImage.startsWith('/') ? currentImage : `/${currentImage}`} 
+                  alt="Current" 
+                  style={{ maxWidth: '100%', maxHeight: '200px', borderRadius: '4px' }}
+                />
+              </div>
+            )}
           </div>
           <button 
             type="submit"
